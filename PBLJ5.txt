@@ -1,0 +1,181 @@
+1. Question - Create a Java program to serialize and deserialize a Student object. The program should:
+Serialize a Student object (containing id, name, and GPA) and save it to a file.
+Deserialize the object from the file and display the student details.
+Handle FileNotFoundException, IOException, and ClassNotFoundException using exception handling.
+
+Code: 
+import java.io.*; 
+ 
+class Student implements Serializable { 
+    private static final long serialVersionUID = 1L; 
+    private int id; 
+    private String name; 
+    private double gpa; 
+    public Student(int id, String name, double gpa) { 
+        this.id = id; 
+        this.name = name; 
+        this.gpa = gpa; 
+    } 
+    @Override 
+    public String toString() { 
+        return "Student{id=" + id + ", name='" + name + "', gpa=" + gpa + "}"; 
+    } 
+} 
+public class StudentSerialization { 
+    private static final String FILE_NAME = "student.ser"; 
+ 
+    public static void main(String[] args) { 
+        Student student = new Student(11, "ABC", 9.9); 
+        serializeStudent(student); 
+        deserializeStudent(); 
+    } 
+    public static void serializeStudent(Student student) { 
+        try (ObjectOutputStream oos = new ObjectOutputStream(new 
+FileOutputStream(FILE_NAME))) { 
+            oos.writeObject(student); 
+            System.out.println("Student object serialized successfully."); 
+        } catch (FileNotFoundException e) { 
+            System.err.println("File not found: " + e.getMessage()); 
+        } catch (IOException e) { 
+            System.err.println("IOException occurred: " + e.getMessage()); 
+        } 
+    } 
+    public static void deserializeStudent() { 
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) 
+{ 
+            Student student = (Student) ois.readObject(); 
+            System.out.println("Deserialized Student: " + student); 
+        } catch (FileNotFoundException e) { 
+            System.err.println("File not found: " + e.getMessage()); 
+        } catch (IOException e) { 
+            System.err.println("IOException occurred: " + e.getMessage()); 
+        } catch (ClassNotFoundException e) { 
+System.err.println("Class not found: " + e.getMessage()); 
+} 
+} 
+} 
+
+OUTPUT:
+Student object serialized successfully.
+Deserialize Student: student{id=11, name='ABC', gpa=9.9}
+
+2. Create a menu-based Java application with the following options.
+1.Add an Employee 2. Display All 3. Exit If option 1 is selected, the application should gather details of the employee like employee name, employee id, designation and salary and store it in a file. 
+If option 2 is selected, the application should display all the employee details. If option 3 is selected the application should exit.
+
+Code :
+import java.io.*;
+import java.util.*;
+public class EmployeeManagementApp {
+    static class Employee implements Serializable {
+        private static final long serialVersionUID = 1L;
+        private String name;
+        private int id;
+        private String designation;
+        private double salary;
+        public Employee(String name, int id, String designation, double salary) {
+            this.name = name;
+            this.id = id;
+            this.designation = designation;
+            this.salary = salary;
+        }
+        public String getName() {
+            return name;
+        }
+        public int getId() {
+            return id;
+        }
+        public String getDesignation() {
+            return designation;
+        }
+        public double getSalary() {
+            return salary;
+        }
+        @Override
+        public String toString() {
+            return "Employee [ID=" + id + ", Name=" + name + ", Designation=" + designation + ", Salary=" + salary + "]";
+        }
+    }
+    private static final String FILE_NAME = "employees.ser";
+    private static List<Employee> employeeList = new ArrayList<>();
+    public static void main(String[] args) {
+        loadEmployees();
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+        do {
+            System.out.println("\nEmployee Management System");
+            System.out.println("1. Add an Employee");
+            System.out.println("2. Display All Employees");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); 
+            switch (choice) {
+                case 1:
+                    addEmployee(scanner);
+                    break;
+                case 2:
+                    displayEmployees();
+                    break;
+                case 3:
+                    System.out.println("Exiting the program...");
+                    break;
+                default:
+                    System.out.println("Invalid choice, please try again.");
+            }
+        } while (choice != 3);
+        saveEmployees();
+        scanner.close();
+    }
+    private static void addEmployee(Scanner scanner) {
+        System.out.print("Enter employee name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter employee ID: ");
+        int id = scanner.nextInt();
+        scanner.nextLine(); 
+        System.out.print("Enter employee designation: ");
+        String designation = scanner.nextLine();
+        System.out.print("Enter employee salary: ");
+        double salary = scanner.nextDouble();
+        Employee employee = new Employee(name, id, designation, salary);
+        employeeList.add(employee);
+        System.out.println("Employee added successfully.");
+    }
+    private static void displayEmployees() {
+        if (employeeList.isEmpty()) {
+            System.out.println("No employees found.");
+        } else {
+            System.out.println("\nEmployee Details:");
+            for (Employee employee : employeeList) {
+                System.out.println(employee);
+            }
+        }
+    }
+    private static void loadEmployees() {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            employeeList = (List<Employee>) in.readObject();
+        } catch (FileNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error loading employees: " + e.getMessage());
+        }
+    }
+    private static void saveEmployees() {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+            out.writeObject(employeeList);
+        } catch (IOException e) {
+            System.out.println("Error saving employees: " + e.getMessage());
+        }
+    }
+}
+
+OUTPUT :
+Employee Management System
+1. Add an Employee
+2. Display All Employees
+3. Exit
+Enter your choice: 1
+Enter employee name: John Doe
+Enter employee ID: 1001
+Enter employee designation: Software Engineer
+Enter employee salary: 75000
+Employee added successfully.
